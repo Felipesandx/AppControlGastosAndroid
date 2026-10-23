@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        mavenLocal()
+        mavenLocal() // Fundamental para que lea tu carpeta .m2
     }
 }
 

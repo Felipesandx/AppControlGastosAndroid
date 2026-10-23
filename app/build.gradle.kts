@@ -1,7 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
-    id("com.google.devtools.ksp") // Solo KSP y Android
+    id("com.google.devtools.ksp") // Funciona porque la versión ya está en la raíz
 }
+
+// ... todo el resto del código que copiaste antes (android, dependencies, etc.) se queda igual.
 
 android {
     namespace = "edu.umg.appcontrolgastos"
@@ -13,6 +15,23 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
@@ -21,10 +40,10 @@ android {
 }
 
 dependencies {
-    // 1. Tu librería local
-    implementation(files("libs/app-gastos-core-1.0.0.jar"))
+    // 1. Tu librería desde Maven Local (¡Perfecto!)
+    implementation("umg.edu.gt:app-gastos-core:1.0.0")
 
-    // 2. Room (Persistencia SQLite nativa)
+    // 2. Base de datos Room
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
