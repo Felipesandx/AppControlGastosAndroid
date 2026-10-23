@@ -20,5 +20,5 @@ class TransactionRepositoryRoom(private val dao: TransactionDao) : TransactionRe
         dao.update(TransactionEntity.fromDomain(transaction)) > 0
 
     override suspend fun delete(id: Long): Boolean =
-        dao.delete(id) > 0
+        dao.deleteById(id) > 0
 }
