@@ -3,16 +3,14 @@ plugins {
     id("com.google.devtools.ksp") // Funciona porque la versión ya está en la raíz
 }
 
-// ... todo el resto del código que copiaste antes (android, dependencies, etc.) se queda igual.
-
 android {
     namespace = "edu.umg.appcontrolgastos"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "edu.umg.appcontrolgastos"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
