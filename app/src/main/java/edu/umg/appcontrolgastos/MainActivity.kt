@@ -7,13 +7,12 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import umg.edu.gt.domain.parser.QuickAddParser
-import umg.edu.gt.domain.parser.ParsedTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.umg.appcontrolgastos.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
 import umg.edu.gt.domain.model.Transaction
 import umg.edu.gt.domain.model.TransactionType
+import umg.edu.gt.domain.parser.QuickAddParser
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -24,11 +23,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var sessionManager: UserSessionManager
     private val adapter = TransactionAdapter()
+    private var isDiscreet: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1. Verificar si hay usuario registrado
         sessionManager = UserSessionManager(this)
         if (!sessionManager.isUserRegistered()) {
             startActivity(Intent(this, OnboardingActivity::class.java))
@@ -39,11 +38,23 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val user = sessionManager.getUser()
+        binding.tvGreeting.text = "Hola, ${user.name}"
+        isDiscreet = user.isDiscreetModeEnabled
+
         binding.rvTransactions.layoutManager = LinearLayoutManager(this)
         binding.rvTransactions.adapter = adapter
 
         binding.fabAdd.setOnClickListener {
             startActivity(Intent(this, AddTransactionActivity::class.java))
+        }
+
+        binding.btnToggleDiscreet.setOnClickListener {
+            toggleDiscreetMode()
+        }
+
+        binding.cardSummary.setOnClickListener {
+            toggleDiscreetMode()
         }
 
         binding.etQuickAdd.setOnEditorActionListener { _, actionId, _ ->
@@ -65,6 +76,13 @@ class MainActivity : AppCompatActivity() {
         if (::sessionManager.isInitialized && sessionManager.isUserRegistered()) {
             loadDashboardData()
         }
+    }
+
+    private fun toggleDiscreetMode() {
+        binding.root.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+        isDiscreet = !isDiscreet
+        sessionManager.setDiscreetMode(isDiscreet)
+        loadDashboardData()
     }
 
     private fun processQuickAdd() {
@@ -113,22 +131,28 @@ class MainActivity : AppCompatActivity() {
 
             val summary = financeService.getMonthlySummary()
 
-            // Días restantes en el mes actual
             val calendar = Calendar.getInstance()
             val totalDaysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
             val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
             val daysRemaining = (totalDaysInMonth - currentDay) + 1
 
-            // Regla de negocio de la versión 1.1.0
             val safeToSpendToday = financeService.calculateDailySafeToSpend(
                 profile = user,
                 totalExpensesThisMonth = summary.totalExpenses,
                 daysRemainingInMonth = daysRemaining
             )
 
-            binding.tvTotalBalance.text = financeService.formatCurrency(summary.netBalance)
-            binding.tvTotalIncomes.text = "↑ Ingresos: ${financeService.formatCurrency(summary.totalIncome)}"
-            binding.tvTotalExpenses.text = "Disponible hoy: ${financeService.formatCurrency(safeToSpendToday)}"
+            if (isDiscreet) {
+                binding.tvDailySafeSpend.text = "••••••"
+                binding.tvTotalBalance.text = "••••"
+                binding.tvTotalExpenses.text = "••••"
+                binding.tvImpulseExpenses.text = "••••"
+            } else {
+                binding.tvDailySafeSpend.text = financeService.formatCurrency(safeToSpendToday)
+                binding.tvTotalBalance.text = financeService.formatCurrency(summary.netBalance)
+                binding.tvTotalExpenses.text = financeService.formatCurrency(summary.totalExpenses)
+                binding.tvImpulseExpenses.text = financeService.formatCurrency(summary.impulseExpensesTotal)
+            }
         }
     }
 }

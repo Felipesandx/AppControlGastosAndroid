@@ -8,15 +8,60 @@
     android:background="#F8F9FA"
     tools:context=".MainActivity">
 
-    <!-- Tarjeta de Resumen -->
+    <!-- Encabezado con saludo y botón de modo discreto -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="20dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvGreeting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hola"
+                android:textColor="#212529"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Resumen de gastos"
+                android:textColor="#6C757D"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnToggleDiscreet"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Modo discreto"
+            android:src="@android:drawable/ic_menu_view"
+            app:tint="#495057" />
+    </LinearLayout>
+
+    <!-- Tarjeta Principal: Dinero Seguro y Métricas -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardSummary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="3dp"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -27,47 +72,106 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Balance Actual"
-                android:textColor="#6c757d"
-                android:textSize="14sp" />
+                android:text="Disponible para gastar hoy"
+                android:textColor="#6C757D"
+                android:textSize="13sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvTotalBalance"
+                android:id="@+id/tvDailySafeSpend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Q0.00"
-                android:textColor="#212529"
+                android:layout_marginTop="4dp"
+                android:text="Q 0.00"
+                android:textColor="#0D6EFD"
                 android:textSize="32sp"
                 android:textStyle="bold" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginVertical="12dp"
+                android:background="#E9ECEF" />
+
+            <!-- Métricas secundarias -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tvTotalIncomes"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="↑ Ingresos: Q0.00"
-                    android:textColor="#28a745"
-                    android:textStyle="bold" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvTotalExpenses"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Balance neto"
+                        android:textColor="#6C757D"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/tvTotalBalance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Q 0.00"
+                        android:textColor="#212529"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="↓ Gastos: Q0.00"
-                    android:textColor="#dc3545"
-                    android:textStyle="bold" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total gastos"
+                        android:textColor="#6C757D"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/tvTotalExpenses"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Q 0.00"
+                        android:textColor="#DC3545"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Por impulso"
+                        android:textColor="#6C757D"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/tvImpulseExpenses"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Q 0.00"
+                        android:textColor="#FD7E14"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Barra Smart Quick-Add -->
+    <!-- Barra de captura rápida -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layoutQuickAdd"
         android:layout_width="match_parent"
@@ -108,7 +212,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutQuickAdd" />
 
-    <!-- Lista -->
+    <!-- Lista de transacciones -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTransactions"
         android:layout_width="match_parent"
@@ -120,7 +224,7 @@
         app:layout_constraintTop_toBottomOf="@id/tvHistoryLabel"
         tools:listitem="@layout/item_transaction" />
 
-    <!-- FAB manual -->
+    <!-- Botón flotante -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAdd"
         android:layout_width="wrap_content"
@@ -129,7 +233,7 @@
         android:layout_marginBottom="24dp"
         android:contentDescription="Añadir completo"
         android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="#0d6efd"
+        app:backgroundTint="#0D6EFD"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:tint="@android:color/white" />
