@@ -29,6 +29,10 @@
             android:name=".AddTransactionActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

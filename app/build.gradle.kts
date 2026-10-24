@@ -38,8 +38,8 @@ android {
 }
 
 dependencies {
-    // 1. Tu librería desde Maven Local (¡Perfecto!)
-    implementation("umg.edu.gt:app-gastos-core:1.0.0")
+    // 1. Librería desde Maven Local
+    implementation("umg.edu.gt:app-gastos-core:1.1.0")
 
     // 2. Base de datos Room
     val roomVersion = "2.6.1"
