@@ -7,6 +7,8 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import umg.edu.gt.domain.parser.QuickAddParser
+import umg.edu.gt.domain.parser.ParsedTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.umg.appcontrolgastos.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
