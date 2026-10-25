@@ -1,9 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.AppControlGastos" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    <style name="Theme.AppControlGastos" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Colores del sistema -->
+        <item name="colorPrimary">@color/md_theme_primary</item>
+        <item name="android:statusBarColor">@color/md_theme_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/md_theme_background</item>
     </style>
-
-    <style name="Theme.AppControlGastos" parent="Base.Theme.AppControlGastos" />
 </resources>

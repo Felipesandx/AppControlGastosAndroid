@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Colores base y superficies -->
+    <color name="md_theme_primary">#0D6EFD</color>
+    <color name="md_theme_onPrimary">#FFFFFF</color>
+    <color name="md_theme_background">#F8F9FA</color>
+    <color name="md_theme_surface">#FFFFFF</color>
+    <color name="md_theme_surfaceVariant">#F1F3F5</color>
+    <color name="md_theme_outline">#E9ECEF</color>
+
+    <!-- Tipografía y jerarquía -->
+    <color name="text_primary">#212529</color>
+    <color name="text_secondary">#6C757D</color>
+    <color name="text_muted">#ADB5BD</color>
+
+    <!-- Semánticos financieros -->
+    <color name="finance_income">#28A745</color>
+    <color name="finance_expense">#DC3545</color>
+    <color name="finance_impulse">#FD7E14</color>
+    <color name="finance_impulse_bg">#FFE8E8</color>
 </resources>
