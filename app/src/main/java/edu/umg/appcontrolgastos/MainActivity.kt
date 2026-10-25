@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
                 putExtra("transaction_date", transaction.date)
                 putExtra("transaction_timestamp", transaction.timestamp)
             }
-            startActivity(intent)
+            openAddTransaction(intent)
         }
 
         binding.rvTransactions.layoutManager = LinearLayoutManager(this)
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         setupSwipeToDelete()
 
         binding.fabAdd.setOnClickListener {
-            startActivity(Intent(this, AddTransactionActivity::class.java))
+            openAddTransaction(Intent(this, AddTransactionActivity::class.java))
         }
 
         binding.btnToggleDiscreet.setOnClickListener {
@@ -215,6 +215,19 @@ class MainActivity : AppCompatActivity() {
                 binding.tvTotalExpenses.text = financeService.formatCurrency(summary.totalExpenses)
                 binding.tvImpulseExpenses.text = financeService.formatCurrency(summary.impulseExpensesTotal)
             }
+        }
+    }
+    @Suppress("DEPRECATION")
+    private fun openAddTransaction(intent: Intent) {
+        startActivity(intent)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(
+                OVERRIDE_TRANSITION_OPEN,
+                R.anim.slide_in_bottom,
+                R.anim.stay
+            )
+        } else {
+            overridePendingTransition(R.anim.slide_in_bottom, R.anim.stay)
         }
     }
 }

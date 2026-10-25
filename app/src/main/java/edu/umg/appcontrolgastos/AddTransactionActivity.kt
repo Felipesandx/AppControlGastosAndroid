@@ -145,4 +145,17 @@ class AddTransactionActivity : AppCompatActivity() {
             }
         }
     }
+    @Suppress("DEPRECATION")
+    override fun finish() {
+        super.finish()
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(
+                OVERRIDE_TRANSITION_CLOSE,
+                R.anim.stay,
+                R.anim.slide_out_bottom
+            )
+        } else {
+            overridePendingTransition(R.anim.stay, R.anim.slide_out_bottom)
+        }
+    }
 }
