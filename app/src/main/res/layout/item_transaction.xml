@@ -1,59 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="20dp"
-    android:paddingVertical="12dp">
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="5dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#E9ECEF"
+    app:strokeWidth="1dp"
+    app:cardBackgroundColor="#FFFFFF">
 
-    <!-- Icono de categoría (un círculo de fondo por ahora) -->
-    <View
-        android:id="@+id/viewCategoryIcon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@drawable/ic_launcher_background"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tvDescription"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="12dp"
-        android:textColor="#212529"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@+id/tvAmount"
-        app:layout_constraintStart_toEndOf="@id/viewCategoryIcon"
-        app:layout_constraintTop_toTopOf="@id/viewCategoryIcon"
-        tools:text="Compra de Supermercado" />
+        android:padding="14dp">
 
-    <TextView
-        android:id="@+id/tvCategoryDate"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:textColor="#6c757d"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toBottomOf="@id/viewCategoryIcon"
-        app:layout_constraintEnd_toStartOf="@+id/tvAmount"
-        app:layout_constraintStart_toEndOf="@id/viewCategoryIcon"
-        tools:text="FOOD • 22 Oct" />
+        <!-- Contenedor del ícono de categoría -->
+        <FrameLayout
+            android:id="@+id/iconContainer"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="@android:drawable/dialog_holo_light_frame"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/tvAmount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="-Q450.00"
-        tools:textColor="#dc3545" />
+            <TextView
+                android:id="@+id/tvCategoryInitial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="#212529"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="C" />
+        </FrameLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Descripción y detalles -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/amountLayout"
+            app:layout_constraintStart_toEndOf="@id/iconContainer"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="#212529"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="Almuerzo tacos" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvCategoryName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#6C757D"
+                    android:textSize="12sp"
+                    tools:text="Comida" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:text="•"
+                    android:textColor="#ADB5BD"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#6C757D"
+                    android:textSize="12sp"
+                    tools:text="24 Oct" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Monto e Indicador de Impulso -->
+        <LinearLayout
+            android:id="@+id/amountLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tvAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#212529"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="- Q 45.00" />
+
+            <!-- Badge de Impulso -->
+            <TextView
+                android:id="@+id/tvBadgeImpulse"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:background="#FFE8E8"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="1dp"
+                android:text="Impulso"
+                android:textColor="#DC3545"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
