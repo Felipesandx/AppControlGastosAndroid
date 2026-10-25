@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var sessionManager: UserSessionManager
-    private val adapter = TransactionAdapter()
+    private lateinit var adapter: TransactionAdapter
     private var isDiscreet: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,6 +44,21 @@ class MainActivity : AppCompatActivity() {
         val user = sessionManager.getUser()
         binding.tvGreeting.text = "Hola, ${user.name}"
         isDiscreet = user.isDiscreetModeEnabled
+
+        // Inicializar adaptador con evento de clic para edición
+        adapter = TransactionAdapter { transaction ->
+            val intent = Intent(this, AddTransactionActivity::class.java).apply {
+                putExtra("transaction_id", transaction.id)
+                putExtra("transaction_description", transaction.description)
+                putExtra("transaction_amount", transaction.amount)
+                putExtra("transaction_category", transaction.category.name)
+                putExtra("transaction_is_income", transaction.type == TransactionType.INCOME)
+                putExtra("transaction_is_impulse", transaction.isImpulse)
+                putExtra("transaction_date", transaction.date)
+                putExtra("transaction_timestamp", transaction.timestamp)
+            }
+            startActivity(intent)
+        }
 
         binding.rvTransactions.layoutManager = LinearLayoutManager(this)
         binding.rvTransactions.adapter = adapter

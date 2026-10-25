@@ -9,7 +9,9 @@ import edu.umg.appcontrolgastos.databinding.ItemTransactionBinding
 import umg.edu.gt.domain.model.Transaction
 import umg.edu.gt.domain.model.TransactionType
 
-class TransactionAdapter : ListAdapter<Transaction, TransactionAdapter.TransactionViewHolder>(DiffCallback) {
+class TransactionAdapter(
+    private val onItemClick: (Transaction) -> Unit
+) : ListAdapter<Transaction, TransactionAdapter.TransactionViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TransactionViewHolder {
         val binding = ItemTransactionBinding.inflate(
@@ -21,7 +23,11 @@ class TransactionAdapter : ListAdapter<Transaction, TransactionAdapter.Transacti
     }
 
     override fun onBindViewHolder(holder: TransactionViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        val item = getItem(position)
+        holder.bind(item)
+        holder.itemView.setOnClickListener {
+            onItemClick(item)
+        }
     }
 
     fun getTransactionAt(position: Int): Transaction = getItem(position)

@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:hint="Descripción (ej. Supermercado)"
+        android:hint="Descripción (ej. Cena con amigos)"
         app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -48,13 +48,31 @@
             android:inputType="numberDecimal" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Selector de Categoría con ID actvCategory -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/inputLayoutCategory"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:hint="Categoría"
+        app:layout_constraintTop_toBottomOf="@id/inputLayoutAmount">
+
+        <AutoCompleteTextView
+            android:id="@+id/actvCategory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Tipo de Transacción -->
     <RadioGroup
         android:id="@+id/rgTransactionType"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@id/inputLayoutAmount">
+        app:layout_constraintTop_toBottomOf="@id/inputLayoutCategory">
 
         <RadioButton
             android:id="@+id/rbExpense"
@@ -63,7 +81,7 @@
             android:layout_weight="1"
             android:checked="true"
             android:text="Gasto"
-            android:textColor="#dc3545" />
+            android:textColor="#DC3545" />
 
         <RadioButton
             android:id="@+id/rbIncome"
@@ -71,15 +89,26 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Ingreso"
-            android:textColor="#28a745" />
+            android:textColor="#28A745" />
     </RadioGroup>
+
+    <!-- Switch de Gasto por Impulso con ID switchImpulse -->
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/switchImpulse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="¿Fue una compra por impulso?"
+        android:textColor="#495057"
+        android:textSize="15sp"
+        app:layout_constraintTop_toBottomOf="@id/rgTransactionType" />
 
     <Button
         android:id="@+id/btnSave"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="56dp"
         android:layout_marginBottom="16dp"
-        android:text="Guardar"
+        android:text="Guardar Transacción"
         app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
