@@ -7,7 +7,10 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import edu.umg.appcontrolgastos.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
 import umg.edu.gt.domain.model.Transaction
@@ -45,6 +48,8 @@ class MainActivity : AppCompatActivity() {
         binding.rvTransactions.layoutManager = LinearLayoutManager(this)
         binding.rvTransactions.adapter = adapter
 
+        setupSwipeToDelete()
+
         binding.fabAdd.setOnClickListener {
             startActivity(Intent(this, AddTransactionActivity::class.java))
         }
@@ -76,6 +81,38 @@ class MainActivity : AppCompatActivity() {
         if (::sessionManager.isInitialized && sessionManager.isUserRegistered()) {
             loadDashboardData()
         }
+    }
+
+    private fun setupSwipeToDelete() {
+        val swipeHandler = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean = false
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.bindingAdapterPosition
+                val transactionToDelete = adapter.getTransactionAt(position)
+
+                binding.root.performHapticFeedback(HapticFeedbackConstants.REJECT)
+
+                val financeService = (application as ControlGastosApp).financeService
+                lifecycleScope.launch {
+                    val deleted = financeService.delete(transactionToDelete.id)
+                    if (deleted) {
+                        loadDashboardData()
+                        Snackbar.make(binding.root, "Transacción eliminada", Snackbar.LENGTH_SHORT).show()
+                    } else {
+                        adapter.notifyItemChanged(position)
+                        Toast.makeText(this@MainActivity, "No se pudo eliminar el registro", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(swipeHandler)
+        itemTouchHelper.attachToRecyclerView(binding.rvTransactions)
     }
 
     private fun toggleDiscreetMode() {
