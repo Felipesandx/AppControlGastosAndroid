@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -180,6 +181,15 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val transactions = financeService.listTransactions()
             adapter.submitList(transactions)
+
+            // Alternar vista entre la lista y el empty state
+            if (transactions.isEmpty()) {
+                binding.rvTransactions.visibility = View.GONE
+                binding.layoutEmptyState.visibility = View.VISIBLE
+            } else {
+                binding.rvTransactions.visibility = View.VISIBLE
+                binding.layoutEmptyState.visibility = View.GONE
+            }
 
             val summary = financeService.getMonthlySummary()
 
