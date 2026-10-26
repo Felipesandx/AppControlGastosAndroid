@@ -38,16 +38,17 @@ android {
 }
 
 dependencies {
-    // 1. Librería desde Maven Local
-    implementation("umg.edu.gt:app-gastos-core:1.4.0")
+    //  Librería desde Maven Local
+    implementation("umg.edu.gt:app-gastos-core:2.0.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
-    // 2. Base de datos Room
+    //  Base de datos Room
     val roomVersion = "2.6.1"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
 
-    // 3. UI y AndroidX
+    //  UI y AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

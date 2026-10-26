@@ -1,50 +1,31 @@
 package edu.umg.appcontrolgastos
 
 import android.content.Context
-import android.content.SharedPreferences
-import umg.edu.gt.domain.model.UserProfile
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.first
 
-class UserSessionManager(context: Context) {
+private val Context.dataStore by preferencesDataStore(name = "user_session")
 
-    private val prefs: SharedPreferences =
-        context.getSharedPreferences("user_session_prefs", Context.MODE_PRIVATE)
+class UserSessionManager(private val context: Context) {
 
     companion object {
-        private const val KEY_NAME = "user_name"
-        private const val KEY_BUDGET = "monthly_budget"
-        private const val KEY_DISCREET = "discreet_mode"
+        val ACTIVE_USER_ID = longPreferencesKey("active_user_id")
     }
 
-    fun isUserRegistered(): Boolean = prefs.contains(KEY_NAME)
-
-    fun saveUser(profile: UserProfile) {
-        prefs.edit()
-            .putString(KEY_NAME, profile.name)
-            .putFloat(KEY_BUDGET, profile.monthlyBudget.toFloat())
-            .putBoolean(KEY_DISCREET, profile.isDiscreetModeEnabled)
-            .apply()
+    suspend fun setActiveUser(userId: Long) {
+        context.dataStore.edit { preferences ->
+            preferences[ACTIVE_USER_ID] = userId
+        }
     }
 
-    fun getUser(): UserProfile {
-        return UserProfile(
-            name = prefs.getString(KEY_NAME, "Usuario") ?: "Usuario",
-            monthlyBudget = prefs.getFloat(KEY_BUDGET, 0f).toDouble(),
-            isDiscreetModeEnabled = prefs.getBoolean(KEY_DISCREET, false)
-        )
+    suspend fun getActiveUserId(): Long {
+        val preferences = context.dataStore.data.first()
+        return preferences[ACTIVE_USER_ID] ?: -1L
     }
 
-    fun setDiscreetMode(enabled: Boolean) {
-        prefs.edit().putBoolean(KEY_DISCREET, enabled).apply()
-    }
-
-    fun updateUserName(newName: String) {
-        val currentUser = getUser()
-        val updatedUser = currentUser.copy(name = newName)
-        // Reutiliza el método actual para guardar el usuario
-        saveUser(updatedUser)
-    }
-
-    fun clearSession() {
-        prefs.edit().clear().apply()
+    suspend fun clearSession() {
+        context.dataStore.edit { it.clear() }
     }
 }

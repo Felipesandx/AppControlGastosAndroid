@@ -6,13 +6,19 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import edu.umg.appcontrolgastos.data.AppDatabase
+import edu.umg.appcontrolgastos.data.UserEntity
 import edu.umg.appcontrolgastos.databinding.ActivitySettingsBinding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
     private lateinit var sessionManager: UserSessionManager
+    private val userDao by lazy { AppDatabase.getDatabase(this).userDao() }
+    private var currentUser: UserEntity? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,15 +27,23 @@ class SettingsActivity : AppCompatActivity() {
 
         sessionManager = UserSessionManager(this)
 
-        // Cargar nombre actual
-        binding.etName.setText(sessionManager.getUser().name)
+        lifecycleScope.launch {
+            val userId = sessionManager.getActiveUserId()
+            if (userId != -1L) {
+                currentUser = withContext(Dispatchers.IO) { userDao.getUserById(userId) }
+                binding.etName.setText(currentUser?.name ?: "")
+            }
+        }
 
         binding.btnUpdateName.setOnClickListener {
             val newName = binding.etName.text.toString().trim()
-            if (newName.isNotEmpty()) {
-                sessionManager.updateUserName(newName)
-                Toast.makeText(this, "Perfil actualizado", Toast.LENGTH_SHORT).show()
-                finish()
+            if (newName.isNotEmpty() && currentUser != null) {
+                lifecycleScope.launch {
+                    val updatedUser = currentUser!!.copy(name = newName)
+                    withContext(Dispatchers.IO) { userDao.update(updatedUser) }
+                    Toast.makeText(this@SettingsActivity, "Perfil actualizado", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
             }
         }
 
@@ -51,16 +65,12 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun wipeAllDataAndExit() {
         val financeService = (application as ControlGastosApp).financeService
-
         lifecycleScope.launch {
-            // 1. Borrar base de datos usando el Core
-            financeService.wipeAllData()
-
-            // 2. Limpiar sesión (SharedPreferences)
+            val userId = sessionManager.getActiveUserId()
+            financeService.wipeAllData(userId)
             sessionManager.clearSession()
 
-            // 3. Reiniciar la app mandando al Onboarding
-            val intent = Intent(this@SettingsActivity, OnboardingActivity::class.java).apply {
+            val intent = Intent(this@SettingsActivity, UserSelectionActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }
             startActivity(intent)

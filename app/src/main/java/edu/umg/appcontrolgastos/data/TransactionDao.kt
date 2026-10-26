@@ -1,29 +1,21 @@
 package edu.umg.appcontrolgastos.data
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
-import androidx.room.Update
-import kotlin.jvm.JvmSuppressWildcards
+import androidx.room.*
 
 @Dao
-@JvmSuppressWildcards //Esta anotación sincroniza la compilación de Kotlin 2.0 con KSP
 interface TransactionDao {
-    @Insert
-    suspend fun insert(entity: TransactionEntity): Long
-
-    @Query("SELECT * FROM transactions ORDER BY id ASC")
-    suspend fun getAll(): List<TransactionEntity>
-
-    @Query("SELECT * FROM transactions WHERE id = :id")
-    suspend fun getById(id: Long): TransactionEntity?
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(transaction: TransactionEntity): Long
 
     @Update
-    suspend fun update(entity: TransactionEntity): Int
+    fun update(transaction: TransactionEntity)
 
-    @Query("DELETE FROM transactions WHERE id = :id")
-    suspend fun deleteById(id: Long): Int
+    @Query("DELETE FROM TransactionEntity WHERE id = :id")
+    fun delete(id: Long)
 
-    @Query("DELETE FROM transactions")
-    suspend fun deleteAll(): Int  // <-- Solo agregamos ": Int" al final para evitar el error
+    @Query("SELECT * FROM TransactionEntity WHERE userId = :userId ORDER BY timestamp DESC")
+    fun getAllTransactions(userId: Long): List<TransactionEntity>
+
+    @Query("DELETE FROM TransactionEntity WHERE userId = :userId")
+    fun deleteAll(userId: Long)
 }

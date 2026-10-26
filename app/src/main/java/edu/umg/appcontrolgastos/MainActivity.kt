@@ -1,11 +1,12 @@
 package edu.umg.appcontrolgastos
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -16,37 +17,30 @@ import edu.umg.appcontrolgastos.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
 import umg.edu.gt.domain.model.Transaction
 import umg.edu.gt.domain.model.TransactionType
+import umg.edu.gt.domain.model.UserProfile
 import umg.edu.gt.domain.parser.QuickAddParser
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
+@SuppressLint("SetTextI18n")
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var sessionManager: UserSessionManager
     private lateinit var adapter: TransactionAdapter
-    private var isDiscreet: Boolean = false
+    private var isDiscreet: Boolean = false // Modo discreto manejado en memoria durante la sesión
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        sessionManager = UserSessionManager(this)
-        if (!sessionManager.isUserRegistered()) {
-            startActivity(Intent(this, OnboardingActivity::class.java))
-            finish()
-            return
-        }
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val user = sessionManager.getUser()
-        binding.tvGreeting.text = "Hola, ${user.name}"
-        isDiscreet = user.isDiscreetModeEnabled
+        sessionManager = UserSessionManager(this)
 
-        // Inicializar adaptador con evento de clic para edición
+        binding.tvGreeting.text = "¡Hola!"
+
         adapter = TransactionAdapter { transaction ->
             val intent = Intent(this, AddTransactionActivity::class.java).apply {
                 putExtra("transaction_id", transaction.id)
@@ -97,9 +91,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (::sessionManager.isInitialized && sessionManager.isUserRegistered()) {
-            loadDashboardData()
-        }
+        loadDashboardData()
     }
 
     private fun setupSwipeToDelete() {
@@ -114,7 +106,7 @@ class MainActivity : AppCompatActivity() {
                 val position = viewHolder.bindingAdapterPosition
                 val transactionToDelete = adapter.getTransactionAt(position)
 
-                binding.root.performHapticFeedback(HapticFeedbackConstants.REJECT)
+                binding.root.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 
                 val financeService = (application as ControlGastosApp).financeService
                 lifecycleScope.launch {
@@ -129,15 +121,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
-        val itemTouchHelper = ItemTouchHelper(swipeHandler)
-        itemTouchHelper.attachToRecyclerView(binding.rvTransactions)
+        ItemTouchHelper(swipeHandler).attachToRecyclerView(binding.rvTransactions)
     }
 
     private fun toggleDiscreetMode() {
-        binding.root.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+        binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         isDiscreet = !isDiscreet
-        sessionManager.setDiscreetMode(isDiscreet)
         loadDashboardData()
     }
 
@@ -151,22 +140,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-
         val dateString = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date())
-        val transaction = Transaction(
-            id = 0,
-            amount = parsed.amount,
-            description = parsed.description,
-            date = dateString,
-            timestamp = System.currentTimeMillis(),
-            type = TransactionType.EXPENSE,
-            category = parsed.category,
-            isImpulse = false
-        )
 
-        val financeService = (application as ControlGastosApp).financeService
         lifecycleScope.launch {
+            val userId = sessionManager.getActiveUserId()
+            if (userId == -1L) return@launch
+
+            val transaction = Transaction(
+                id = 0,
+                userId = userId, // Parámetro obligatorio V2.0
+                amount = parsed.amount,
+                description = parsed.description,
+                date = dateString,
+                timestamp = System.currentTimeMillis(),
+                type = TransactionType.EXPENSE,
+                category = parsed.category,
+                isImpulse = false
+            )
+
+            val financeService = (application as ControlGastosApp).financeService
             val error = financeService.register(transaction)
+
             if (error == null) {
                 binding.etQuickAdd.text?.clear()
                 binding.etQuickAdd.clearFocus()
@@ -179,13 +173,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadDashboardData() {
         val financeService = (application as ControlGastosApp).financeService
-        val user = sessionManager.getUser()
 
         lifecycleScope.launch {
-            val transactions = financeService.listTransactions()
+            val userId = sessionManager.getActiveUserId()
+            if (userId == -1L) {
+                startActivity(Intent(this@MainActivity, UserSelectionActivity::class.java))
+                finish()
+                return@launch
+            }
+
+            // Llamadas al core enviando el userId
+            val transactions = financeService.listTransactions(userId)
             adapter.submitList(transactions)
 
-            // Alternar vista entre la lista y el empty state
             if (transactions.isEmpty()) {
                 binding.rvTransactions.visibility = View.GONE
                 binding.layoutEmptyState.visibility = View.VISIBLE
@@ -194,15 +194,14 @@ class MainActivity : AppCompatActivity() {
                 binding.layoutEmptyState.visibility = View.GONE
             }
 
-            val summary = financeService.getMonthlySummary()
-
+            val summary = financeService.getMonthlySummary(userId)
             val calendar = Calendar.getInstance()
-            val totalDaysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
-            val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
-            val daysRemaining = (totalDaysInMonth - currentDay) + 1
+            val daysRemaining = (calendar.getActualMaximum(Calendar.DAY_OF_MONTH) - calendar.get(Calendar.DAY_OF_MONTH)) + 1
 
+            // Perfil temporal en memoria para cálculos
+            val profile = UserProfile(id = userId, name = "Usuario", isDiscreetModeEnabled = isDiscreet)
             val safeToSpendToday = financeService.calculateDailySafeToSpend(
-                profile = user,
+                profile = profile,
                 totalExpensesThisMonth = summary.totalExpenses,
                 daysRemainingInMonth = daysRemaining
             )
@@ -220,6 +219,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     @Suppress("DEPRECATION")
     private fun openAddTransaction(intent: Intent) {
         startActivity(intent)

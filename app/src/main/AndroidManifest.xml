@@ -13,27 +13,32 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppControlGastos">
 
-        <!-- Pantalla principal -->
+        <!-- 1. NUEVA PANTALLA DE INICIO (Selector de perfiles) -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustPan">
+            android:name=".UserSelectionActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Nueva pantalla para agregar transacción -->
+        <!-- 2. Pantalla principal (Dashboard) -->
+        <!-- Ya no es el launcher, así que exported pasa a false -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
+
+        <!-- 3. Pantalla para agregar transacción -->
         <activity
             android:name=".AddTransactionActivity"
             android:exported="false" />
 
+        <!-- 4. Pantalla de configuración y peligro -->
         <activity
-            android:name=".OnboardingActivity"
+            android:name=".SettingsActivity"
             android:exported="false" />
-
-        <activity android:name=".SettingsActivity" />
 
     </application>
 

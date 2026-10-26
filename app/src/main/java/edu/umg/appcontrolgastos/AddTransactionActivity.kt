@@ -147,19 +147,23 @@ class AddTransactionActivity : AppCompatActivity() {
             System.currentTimeMillis()
         }
 
-        val transaction = Transaction(
-            id = editingTransactionId,
-            amount = amount,
-            description = description,
-            date = dateString,
-            timestamp = timestamp,
-            type = type,
-            category = category,
-            isImpulse = isImpulse
-        )
-
-        val financeService = (application as ControlGastosApp).financeService
+        // Único bloque de ejecución usando la sesión dinámica
         lifecycleScope.launch {
+            val currentUserId = UserSessionManager(this@AddTransactionActivity).getActiveUserId()
+
+            val transaction = Transaction(
+                id = editingTransactionId,
+                userId = currentUserId, // ID recuperado dinámicamente
+                amount = amount,
+                description = description,
+                date = dateString,
+                timestamp = timestamp,
+                type = type,
+                category = category,
+                isImpulse = isImpulse
+            )
+
+            val financeService = (application as ControlGastosApp).financeService
             val error = if (editingTransactionId != 0L) {
                 financeService.update(transaction)
             } else {
