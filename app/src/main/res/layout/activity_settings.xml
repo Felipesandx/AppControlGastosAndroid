@@ -11,7 +11,7 @@
         android:id="@+id/tvSettingsTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Configuración"
+        android:text="Configuración de Perfil"
         android:textColor="@color/text_primary"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:hint="Tu Nombre"
+        android:hint="Tu Nombre / Nombre de Perfil"
         app:layout_constraintTop_toBottomOf="@id/tvSettingsTitle">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -38,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_marginTop="16dp"
-        android:text="Actualizar Perfil"
+        android:text="Actualizar Nombre de Perfil"
         app:layout_constraintTop_toBottomOf="@id/layoutName" />
 
     <View
@@ -63,14 +63,25 @@
         app:layout_constraintTop_toBottomOf="@id/divider" />
 
     <Button
+        android:id="@+id/btnDeleteProfile"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="12dp"
+        android:text="Eliminar este perfil"
+        android:textColor="@color/finance_expense"
+        app:strokeColor="@color/finance_expense"
+        app:layout_constraintTop_toBottomOf="@id/tvDangerZone" />
+
+    <Button
         android:id="@+id/btnWipeData"
         style="@style/Widget.Material3.Button.OutlinedButton"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_marginTop="12dp"
-        android:text="Borrar todos mis datos"
+        android:text="Borrar solo historial de datos"
         android:textColor="@color/finance_expense"
         app:strokeColor="@color/finance_expense"
-        app:layout_constraintTop_toBottomOf="@id/tvDangerZone" />
+        app:layout_constraintTop_toBottomOf="@id/btnDeleteProfile" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

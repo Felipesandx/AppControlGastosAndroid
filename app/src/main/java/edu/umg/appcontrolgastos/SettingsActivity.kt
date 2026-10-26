@@ -47,34 +47,68 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
 
+        binding.btnDeleteProfile.setOnClickListener {
+            showDeleteProfileConfirmationDialog()
+        }
+
         binding.btnWipeData.setOnClickListener {
             showWipeConfirmationDialog()
         }
     }
 
-    private fun showWipeConfirmationDialog() {
+    private fun showDeleteProfileConfirmationDialog() {
+        val name = currentUser?.name ?: "este perfil"
         AlertDialog.Builder(this)
-            .setTitle("¿Borrar todos los datos?")
-            .setMessage("Esta acción es irreversible. Se eliminará todo tu historial de gastos e ingresos, y se cerrará tu sesión.")
-            .setPositiveButton("Sí, borrar todo") { _, _ ->
-                wipeAllDataAndExit()
+            .setTitle("¿Eliminar perfil \"$name\"?")
+            .setMessage("Esta acción es permanente. Se borrarán todos los datos financieros y el perfil.")
+            .setPositiveButton("Sí, eliminar perfil") { _, _ ->
+                deleteCurrentProfile()
             }
             .setNegativeButton("Cancelar", null)
             .show()
     }
 
-    private fun wipeAllDataAndExit() {
+    private fun deleteCurrentProfile() {
+        val financeService = (application as ControlGastosApp).financeService
+        lifecycleScope.launch {
+            val userId = sessionManager.getActiveUserId()
+            if (userId != -1L) {
+                withContext(Dispatchers.IO) {
+                    financeService.wipeAllData(userId)
+                    userDao.deleteById(userId)
+                }
+                sessionManager.clearSession()
+                redirectToUserSelection()
+            }
+        }
+    }
+
+    private fun showWipeConfirmationDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("¿Borrar historial de datos?")
+            .setMessage("Se eliminarán todas tus transacciones registradas, pero tu perfil continuará existiendo.")
+            .setPositiveButton("Sí, borrar datos") { _, _ ->
+                wipeAllData()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun wipeAllData() {
         val financeService = (application as ControlGastosApp).financeService
         lifecycleScope.launch {
             val userId = sessionManager.getActiveUserId()
             financeService.wipeAllData(userId)
-            sessionManager.clearSession()
-
-            val intent = Intent(this@SettingsActivity, UserSelectionActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-            startActivity(intent)
+            Toast.makeText(this@SettingsActivity, "Historial de datos borrado", Toast.LENGTH_SHORT).show()
             finish()
         }
+    }
+
+    private fun redirectToUserSelection() {
+        val intent = Intent(this, UserSelectionActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+        finish()
     }
 }

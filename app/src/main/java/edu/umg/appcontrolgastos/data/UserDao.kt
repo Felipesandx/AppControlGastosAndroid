@@ -18,4 +18,7 @@ interface UserDao {
 
     @Update
     fun update(user: UserEntity)
+
+    @Query("DELETE FROM UserEntity WHERE id = :id")
+    fun deleteById(id: Long)
 }
