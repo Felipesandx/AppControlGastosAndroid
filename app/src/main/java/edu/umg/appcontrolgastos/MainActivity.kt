@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.cardSummary.setOnClickListener {
-            toggleDiscreetMode()
+            startActivity(Intent(this, AnalyticsActivity::class.java))
         }
 
         binding.etQuickAdd.setOnEditorActionListener { _, actionId, _ ->
