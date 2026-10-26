@@ -42,6 +42,7 @@ class AnalyticsActivity : ComponentActivity() {
 
 @Composable
 fun AnalyticsScreen(viewModel: AnalyticsViewModel) {
+    // Escuchamos el estado de forma reactiva
     val state by viewModel.uiState.collectAsState()
 
     Column(
@@ -57,12 +58,20 @@ fun AnalyticsScreen(viewModel: AnalyticsViewModel) {
             modifier = Modifier.padding(bottom = 32.dp, top = 16.dp)
         )
 
+        // Si está cargando, mostramos la ruedita
         if (state.isLoading) {
             CircularProgressIndicator(modifier = Modifier.padding(top = 50.dp))
         } else {
+            // Tarjeta de Totales
             TotalSummaryCard(income = state.totalIncome, expense = state.totalExpense)
+
             Spacer(modifier = Modifier.height(48.dp))
+
+            // Barra visual de Gasto vs Ingreso
             IncomeVsExpenseBar(income = state.totalIncome, expense = state.totalExpense)
+
+            // ---> AQUÍ ES DONDE VA EL MAPA DE CALOR <---
+            WeeklyHeatMap(heatMapData = state.weeklyHeatMap)
         }
     }
 }
@@ -162,6 +171,56 @@ fun IncomeVsExpenseBar(income: Double, expense: Double) {
         ) {
             Text(text = "${(incomeWeight * 100).toInt()}%", color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
             Text(text = "${(expenseWeight * 100).toInt()}%", color = Color(0xFFC62828), fontWeight = FontWeight.Bold)
+        }
+    }
+}
+@Composable
+fun WeeklyHeatMap(heatMapData: List<DailyExpense>) {
+    if (heatMapData.isEmpty()) return
+
+    // Buscamos el gasto máximo de la semana para calcular la intensidad de los colores
+    val maxExpense = heatMapData.maxOfOrNull { it.amount } ?: 0.0
+
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 32.dp)) {
+        Text(
+            text = "Actividad de Gastos (Últimos 7 días)",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            heatMapData.forEach { dayData ->
+                // Calculamos qué tan intenso debe ser el rojo
+                val intensity = if (maxExpense > 0) (dayData.amount / maxExpense).toFloat() else 0f
+
+                // Definimos el color según el gasto
+                val boxColor = when {
+                    dayData.amount == 0.0 -> Color(0xFFEEEEEE) // Gris muy claro (sin gastos)
+                    intensity < 0.3f -> Color(0xFFFFCDD2) // Rojo pálido (gasto bajo)
+                    intensity < 0.7f -> Color(0xFFEF5350) // Rojo medio (gasto normal)
+                    else -> Color(0xFFB71C1C) // Rojo oscuro (gasto alto)
+                }
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(boxColor)
+                    )
+                    Text(
+                        // Mostramos solo las primeras 3 letras del día (Ej: "Lun")
+                        text = dayData.dayName.take(3),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(top = 8.dp),
+                        color = Color.DarkGray
+                    )
+                }
+            }
         }
     }
 }
