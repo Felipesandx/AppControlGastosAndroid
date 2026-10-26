@@ -21,4 +21,8 @@ class TransactionRepositoryRoom(private val dao: TransactionDao) : TransactionRe
 
     override suspend fun delete(id: Long): Boolean =
         dao.deleteById(id) > 0
+
+    override suspend fun deleteAll() {
+        dao.deleteAll()
+    }
 }

@@ -33,6 +33,8 @@
             android:name=".OnboardingActivity"
             android:exported="false" />
 
+        <activity android:name=".SettingsActivity" />
+
     </application>
 
 </manifest>

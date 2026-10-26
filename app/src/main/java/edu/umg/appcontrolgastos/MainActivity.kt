@@ -90,6 +90,9 @@ class MainActivity : AppCompatActivity() {
         binding.layoutQuickAdd.setEndIconOnClickListener {
             processQuickAdd()
         }
+        binding.btnSettings.setOnClickListener {
+            startActivity(Intent(this, SettingsActivity::class.java))
+        }
     }
 
     override fun onResume() {

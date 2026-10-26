@@ -1,5 +1,6 @@
 package edu.umg.appcontrolgastos
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.HapticFeedbackConstants
 import android.view.View
@@ -16,10 +17,20 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@SuppressLint("SetTextI18n")
 class AddTransactionActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddTransactionBinding
-    private val categories = Category.values()
+
+    // Listas separadas actualizadas con las nuevas categorías
+    private val expenseCategories = listOf(
+        Category.FOOD, Category.TRANSPORT, Category.ENTERTAINMENT,
+        Category.HEALTH, Category.STUDIES, Category.OTHER
+    )
+    private val incomeCategories = listOf(
+        Category.SALARY, Category.INVESTMENT, Category.GIFT, Category.OTHER
+    )
+
     private var editingTransactionId: Long = 0L
     private var existingTimestamp: Long = 0L
     private var existingDate: String = ""
@@ -29,7 +40,7 @@ class AddTransactionActivity : AppCompatActivity() {
         binding = ActivityAddTransactionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupCategoryDropdown()
+        updateCategoryDropdown(isIncome = false)
         setupTypeListeners()
         checkEditMode()
 
@@ -38,8 +49,15 @@ class AddTransactionActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupCategoryDropdown() {
-        val categoryNames = categories.map { it.name.replace("_", " ").lowercase().replaceFirstChar { char -> char.titlecase() } }
+    private fun updateCategoryDropdown(isIncome: Boolean) {
+        val activeCategories = if (isIncome) incomeCategories else expenseCategories
+
+        val categoryNames = activeCategories.map {
+            it.name.lowercase(Locale.getDefault()).replaceFirstChar { char ->
+                if (char.isLowerCase()) char.titlecase(Locale.getDefault()) else char.toString()
+            }
+        }
+
         val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, categoryNames)
         binding.actvCategory.setAdapter(adapter)
         binding.actvCategory.setText(categoryNames.first(), false)
@@ -50,8 +68,10 @@ class AddTransactionActivity : AppCompatActivity() {
             if (checkedId == R.id.rbIncome) {
                 binding.switchImpulse.isChecked = false
                 binding.switchImpulse.visibility = View.GONE
+                updateCategoryDropdown(isIncome = true)
             } else {
                 binding.switchImpulse.visibility = View.VISIBLE
+                updateCategoryDropdown(isIncome = false)
             }
         }
     }
@@ -66,7 +86,9 @@ class AddTransactionActivity : AppCompatActivity() {
             binding.etAmount.setText(intent.getDoubleExtra("transaction_amount", 0.0).toString())
 
             val categoryName = intent.getStringExtra("transaction_category") ?: Category.OTHER.name
-            val formattedCategory = categoryName.replace("_", " ").lowercase().replaceFirstChar { it.titlecase() }
+            val formattedCategory = categoryName.lowercase(Locale.getDefault()).replaceFirstChar {
+                if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+            }
             binding.actvCategory.setText(formattedCategory, false)
 
             val isIncome = intent.getBooleanExtra("transaction_is_income", false)
@@ -99,12 +121,18 @@ class AddTransactionActivity : AppCompatActivity() {
             return
         }
 
-        binding.root.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        // Se usa KEYBOARD_TAP compatible con todas las versiones de Android
+        binding.root.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
 
-        val type = if (binding.rbExpense.isChecked) TransactionType.EXPENSE else TransactionType.INCOME
-        val selectedIndex = categories.map { it.name.replace("_", " ").lowercase().replaceFirstChar { char -> char.titlecase() } }
-            .indexOf(binding.actvCategory.text.toString())
-        val category = if (selectedIndex >= 0) categories[selectedIndex] else Category.OTHER
+        val isIncome = binding.rbIncome.isChecked
+        val type = if (isIncome) TransactionType.INCOME else TransactionType.EXPENSE
+
+        val activeCategories = if (isIncome) incomeCategories else expenseCategories
+        val selectedText = binding.actvCategory.text.toString()
+        val category = activeCategories.find {
+            it.name.equals(selectedText, ignoreCase = true)
+        } ?: Category.OTHER
+
         val isImpulse = type == TransactionType.EXPENSE && binding.switchImpulse.isChecked
 
         val dateString = if (editingTransactionId != 0L && existingDate.isNotEmpty()) {
@@ -145,6 +173,7 @@ class AddTransactionActivity : AppCompatActivity() {
             }
         }
     }
+
     @Suppress("DEPRECATION")
     override fun finish() {
         super.finish()

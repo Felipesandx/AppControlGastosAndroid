@@ -23,4 +23,7 @@ interface TransactionDao {
 
     @Query("DELETE FROM transactions WHERE id = :id")
     suspend fun deleteById(id: Long): Int
+
+    @Query("DELETE FROM transactions")
+    suspend fun deleteAll(): Int  // <-- Solo agregamos ": Int" al final para evitar el error
 }

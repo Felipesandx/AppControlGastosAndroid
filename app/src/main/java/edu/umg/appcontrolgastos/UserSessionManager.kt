@@ -36,4 +36,15 @@ class UserSessionManager(context: Context) {
     fun setDiscreetMode(enabled: Boolean) {
         prefs.edit().putBoolean(KEY_DISCREET, enabled).apply()
     }
+
+    fun updateUserName(newName: String) {
+        val currentUser = getUser()
+        val updatedUser = currentUser.copy(name = newName)
+        // Reutiliza el método actual para guardar el usuario
+        saveUser(updatedUser)
+    }
+
+    fun clearSession() {
+        prefs.edit().clear().apply()
+    }
 }
