@@ -23,13 +23,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <View
+        <ImageView
             android:id="@+id/avatarView"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/ic_launcher_background"
             android:backgroundTint="@color/md_theme_primary"
+            android:contentDescription="Icono de Usuario"
+            android:padding="12dp"
+            android:src="@drawable/ic_person"
+            app:tint="@color/md_theme_onPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ibDeleteUser" />
