@@ -198,13 +198,12 @@ class MainActivity : AppCompatActivity() {
             val calendar = Calendar.getInstance()
             val daysRemaining = (calendar.getActualMaximum(Calendar.DAY_OF_MONTH) - calendar.get(Calendar.DAY_OF_MONTH)) + 1
 
-            // Perfil temporal en memoria para cálculos
-            val profile = UserProfile(id = userId, name = "Usuario", isDiscreetModeEnabled = isDiscreet)
-            val safeToSpendToday = financeService.calculateDailySafeToSpend(
-                profile = profile,
-                totalExpensesThisMonth = summary.totalExpenses,
-                daysRemainingInMonth = daysRemaining
-            )
+            // Calculamos el disponible diario basándonos en tu SALDO NETO REAL disponible
+            val safeToSpendToday = if (summary.netBalance > 0 && daysRemaining > 0) {
+                summary.netBalance / daysRemaining
+            } else {
+                0.0
+            }
 
             if (isDiscreet) {
                 binding.tvDailySafeSpend.text = "••••••"
