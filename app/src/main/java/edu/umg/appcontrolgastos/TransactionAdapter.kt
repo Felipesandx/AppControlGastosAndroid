@@ -4,6 +4,7 @@ import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -41,6 +42,7 @@ class TransactionAdapter(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Transaction) {
+            val context = binding.root.context
             binding.tvDescription.text = item.description
             binding.tvDate.text = item.date
 
@@ -58,9 +60,9 @@ class TransactionAdapter(
             val isIncome = item.type == TransactionType.INCOME
             val prefix = if (isIncome) "+" else "-"
             binding.tvAmount.text = String.format(Locale.US, "%s Q %.2f", prefix, item.amount)
-            binding.tvAmount.setTextColor(
-                if (isIncome) "#28A745".toColorInt() else "#212529".toColorInt()
-            )
+
+            val colorRes = if (isIncome) R.color.finance_income else R.color.finance_expense
+            binding.tvAmount.setTextColor(ContextCompat.getColor(context, colorRes))
         }
 
         private fun applyCategoryStyle(category: Category) {
@@ -71,7 +73,7 @@ class TransactionAdapter(
                 "HEALTH" -> Pair("#E6FCF5", "#0CA678")
                 "STUDIES" -> Pair("#EBFBEE", "#40C057")
                 "SALARY" -> Pair("#E6FCF5", "#20C997")
-                else -> Pair("#F1F3F5", "#495057")
+                else -> Pair("#E9ECEF", "#343A40")
             }
 
             val shape = GradientDrawable().apply {
