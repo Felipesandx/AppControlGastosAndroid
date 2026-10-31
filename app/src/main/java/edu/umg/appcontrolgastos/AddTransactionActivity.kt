@@ -40,6 +40,10 @@ class AddTransactionActivity : AppCompatActivity() {
         binding = ActivityAddTransactionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.ibBack.setOnClickListener {
+            finish()
+        }
+
         updateCategoryDropdown(isIncome = false)
         setupTypeListeners()
         checkEditMode()

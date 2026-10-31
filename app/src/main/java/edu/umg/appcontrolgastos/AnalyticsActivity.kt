@@ -33,7 +33,10 @@ class AnalyticsActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AnalyticsScreen(viewModel = viewModel)
+                    AnalyticsScreen(
+                        viewModel = viewModel,
+                        onBackClick = { finish() }
+                    )
                 }
             }
         }
@@ -41,7 +44,7 @@ class AnalyticsActivity : ComponentActivity() {
 }
 
 @Composable
-fun AnalyticsScreen(viewModel: AnalyticsViewModel) {
+fun AnalyticsScreen(viewModel: AnalyticsViewModel, onBackClick: () -> Unit) {
     // Escuchamos el estado de forma reactiva
     val state by viewModel.uiState.collectAsState()
 
@@ -51,12 +54,23 @@ fun AnalyticsScreen(viewModel: AnalyticsViewModel) {
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "📊 Resumen Financiero",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 32.dp, top = 16.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextButton(onClick = onBackClick) {
+                Text(text = "← Regresar", fontWeight = FontWeight.Bold)
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "📊 Resumen Financiero",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.weight(1f))
+        }
 
         // Si está cargando, mostramos la ruedita
         if (state.isLoading) {
@@ -65,12 +79,12 @@ fun AnalyticsScreen(viewModel: AnalyticsViewModel) {
             // Tarjeta de Totales
             TotalSummaryCard(income = state.totalIncome, expense = state.totalExpense)
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Barra visual de Gasto vs Ingreso
             IncomeVsExpenseBar(income = state.totalIncome, expense = state.totalExpense)
 
-            // ---> AQUÍ ES DONDE VA EL MAPA DE CALOR <---
+            // ---> MAPA DE CALOR <---
             WeeklyHeatMap(heatMapData = state.weeklyHeatMap)
         }
     }
@@ -174,11 +188,11 @@ fun IncomeVsExpenseBar(income: Double, expense: Double) {
         }
     }
 }
+
 @Composable
 fun WeeklyHeatMap(heatMapData: List<DailyExpense>) {
     if (heatMapData.isEmpty()) return
 
-    // Buscamos el gasto máximo de la semana para calcular la intensidad de los colores
     val maxExpense = heatMapData.maxOfOrNull { it.amount } ?: 0.0
 
     Column(modifier = Modifier.fillMaxWidth().padding(top = 32.dp)) {
@@ -194,15 +208,13 @@ fun WeeklyHeatMap(heatMapData: List<DailyExpense>) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             heatMapData.forEach { dayData ->
-                // Calculamos qué tan intenso debe ser el rojo
                 val intensity = if (maxExpense > 0) (dayData.amount / maxExpense).toFloat() else 0f
 
-                // Definimos el color según el gasto
                 val boxColor = when {
-                    dayData.amount == 0.0 -> Color(0xFFEEEEEE) // Gris muy claro (sin gastos)
-                    intensity < 0.3f -> Color(0xFFFFCDD2) // Rojo pálido (gasto bajo)
-                    intensity < 0.7f -> Color(0xFFEF5350) // Rojo medio (gasto normal)
-                    else -> Color(0xFFB71C1C) // Rojo oscuro (gasto alto)
+                    dayData.amount == 0.0 -> Color(0xFFEEEEEE)
+                    intensity < 0.3f -> Color(0xFFFFCDD2)
+                    intensity < 0.7f -> Color(0xFFEF5350)
+                    else -> Color(0xFFB71C1C)
                 }
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -213,7 +225,6 @@ fun WeeklyHeatMap(heatMapData: List<DailyExpense>) {
                             .background(boxColor)
                     )
                     Text(
-                        // Mostramos solo las primeras 3 letras del día (Ej: "Lun")
                         text = dayData.dayName.take(3),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(top = 8.dp),

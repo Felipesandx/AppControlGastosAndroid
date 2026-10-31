@@ -27,6 +27,10 @@ class SettingsActivity : AppCompatActivity() {
 
         sessionManager = UserSessionManager(this)
 
+        binding.ibBack.setOnClickListener {
+            finish()
+        }
+
         lifecycleScope.launch {
             val userId = sessionManager.getActiveUserId()
             if (userId != -1L) {

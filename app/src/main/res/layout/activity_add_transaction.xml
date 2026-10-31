@@ -7,15 +7,28 @@
     android:background="#F8F9FA"
     android:padding="24dp">
 
+    <ImageButton
+        android:id="@+id/ibBack"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Regresar"
+        android:src="@android:drawable/ic_menu_revert"
+        app:tint="#212529"
+        app:layout_constraintBottom_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvTitle" />
+
     <TextView
         android:id="@+id/tvTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:text="Nueva Transacción"
         android:textColor="#212529"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/ibBack"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
@@ -48,7 +61,6 @@
             android:inputType="numberDecimal" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Selector de Categoría con ID actvCategory -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/inputLayoutCategory"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
@@ -65,7 +77,6 @@
             android:inputType="none" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <!-- Tipo de Transacción -->
     <RadioGroup
         android:id="@+id/rgTransactionType"
         android:layout_width="match_parent"
@@ -92,7 +103,6 @@
             android:textColor="#28A745" />
     </RadioGroup>
 
-    <!-- Switch de Gasto por Impulso con ID switchImpulse -->
     <com.google.android.material.materialswitch.MaterialSwitch
         android:id="@+id/switchImpulse"
         android:layout_width="match_parent"
